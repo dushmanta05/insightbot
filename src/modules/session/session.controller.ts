@@ -10,14 +10,21 @@ import {
 import { SessionService } from './session.service';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { UpdateSessionDto } from './dto/update-session.dto';
+import { SessionResponseDto } from './dto/session-response.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('session')
 export class SessionController {
   constructor(private readonly sessionService: SessionService) {}
 
   @Post()
-  create(@Body() createSessionDto: CreateSessionDto) {
-    return this.sessionService.create(createSessionDto);
+  async create(
+    @Body() createSessionDto: CreateSessionDto,
+  ): Promise<SessionResponseDto> {
+    const session = await this.sessionService.create(createSessionDto);
+    return plainToInstance(SessionResponseDto, session, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Get()
