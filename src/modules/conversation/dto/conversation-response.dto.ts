@@ -1,6 +1,6 @@
 import { Exclude, Expose } from 'class-transformer';
 import type { ContentType } from 'src/common/enums/content-type.enum';
-import type { SenderType } from 'src/common/enums/sender-type.enum';
+import type { UserType } from 'src/common/enums/sender-type.enum';
 
 export class ConversationResponseDto {
   @Expose()
@@ -13,7 +13,7 @@ export class ConversationResponseDto {
   content: string;
 
   @Exclude()
-  senderType: SenderType;
+  role: UserType;
 
   @Exclude()
   contentType: ContentType;

@@ -5,6 +5,9 @@ export default () => {
     DATABASE_NAME,
     DATABASE_USER,
     DATABASE_PWD,
+    API_URL,
+    API_TOKEN,
+    MODEL_NAME,
   } = process.env;
 
   return {
@@ -14,6 +17,11 @@ export default () => {
       name: DATABASE_NAME,
       username: DATABASE_USER,
       password: DATABASE_PWD,
+    },
+    modelConfig: {
+      url: API_URL,
+      token: API_TOKEN,
+      model: MODEL_NAME,
     },
   };
 };

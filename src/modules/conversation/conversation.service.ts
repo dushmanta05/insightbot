@@ -4,12 +4,15 @@ import { Repository } from 'typeorm';
 import { Conversation } from './entities/conversation.entity';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
+import { UserType } from 'src/common/enums/sender-type.enum';
+import { ApiService } from 'src/common/api/api.service';
 
 @Injectable()
 export class ConversationService {
   constructor(
     @InjectRepository(Conversation)
     private readonly conversationRepository: Repository<Conversation>,
+    private readonly apiService: ApiService,
   ) {}
 
   async create(
@@ -18,7 +21,41 @@ export class ConversationService {
     const conversation = this.conversationRepository.create(
       createConversationDto,
     );
-    return await this.conversationRepository.save(conversation);
+    const savedUserConversation =
+      await this.conversationRepository.save(conversation);
+
+    const sessionMessages = await this.conversationRepository.find({
+      where: { sessionId: createConversationDto.sessionId },
+      select: ['role', 'content'],
+      order: { createdAt: 'ASC' },
+    });
+
+    const formattedMessages = sessionMessages.map((message) => ({
+      role: message.role,
+      content: message.content,
+    }));
+
+    formattedMessages.push({
+      role: savedUserConversation.role,
+      content: savedUserConversation.content,
+    });
+
+    const { success, data } =
+      await this.apiService.generateChatResponse(formattedMessages);
+
+    if (!success) {
+      throw new Error('Failed to generate chat response.');
+    }
+
+    const agentConversation = this.conversationRepository.create({
+      content: data.content,
+      role: UserType.ASSISTANT,
+      sessionId: createConversationDto.sessionId,
+    });
+
+    await this.conversationRepository.save(agentConversation);
+
+    return agentConversation;
   }
 
   async findAll(): Promise<Conversation[]> {

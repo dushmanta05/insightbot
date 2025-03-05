@@ -1,5 +1,5 @@
 import { ContentType } from 'src/common/enums/content-type.enum';
-import { SenderType } from 'src/common/enums/sender-type.enum';
+import { UserType } from 'src/common/enums/sender-type.enum';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -16,8 +16,8 @@ export class Conversation {
   @Column({ type: 'uuid', nullable: false })
   sessionId: string;
 
-  @Column({ type: 'enum', enum: SenderType, default: SenderType.User })
-  senderType: SenderType;
+  @Column({ type: 'enum', enum: UserType, default: UserType.USER })
+  role: UserType;
 
   @Column({ type: 'text', nullable: false })
   content: string;
