@@ -16,7 +16,7 @@ export class Conversation {
   @Column({ type: 'uuid', nullable: false })
   sessionId: string;
 
-  @Column({ type: 'enum', enum: SenderType })
+  @Column({ type: 'enum', enum: SenderType, default: SenderType.User })
   senderType: SenderType;
 
   @Column({ type: 'text', nullable: false })
