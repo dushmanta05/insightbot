@@ -8,8 +8,4 @@ export class CreateSiteDto {
   @IsString()
   @IsNotEmpty()
   name: string;
-
-  @IsString()
-  @IsNotEmpty()
-  embedCode: string;
 }

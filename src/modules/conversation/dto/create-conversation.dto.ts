@@ -1,32 +1,21 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsUUID,
-  IsArray,
-  ValidateNested,
-} from 'class-validator';
-import { Type } from 'class-transformer';
-
-class MessageDto {
-  @IsString()
-  @IsNotEmpty()
-  sender: 'user' | 'agent';
-
-  @IsString()
-  @IsNotEmpty()
-  message: string;
-
-  @IsNotEmpty()
-  timestamp: Date;
-}
+import { IsString, IsNotEmpty, IsUUID, IsOptional } from 'class-validator';
+import type { SenderType } from 'src/common/enums/sender-type.enum';
+import type { ContentType } from 'src/common/enums/content-type.enum';
 
 export class CreateConversationDto {
+  @IsString()
+  @IsNotEmpty()
+  senderType: SenderType;
+
+  @IsString()
+  @IsNotEmpty()
+  content: string;
+
   @IsUUID()
   @IsNotEmpty()
   sessionId: string;
 
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => MessageDto)
-  messages: MessageDto[];
+  @IsOptional()
+  @IsNotEmpty()
+  contentType: ContentType;
 }
