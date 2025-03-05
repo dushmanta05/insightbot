@@ -14,9 +14,12 @@ export class ApiService {
     messages: Array<{ role: string; content: string }>,
   ) {
     try {
-      const apiUrl = this.configService.get<string>('modelConfig.url');
-      const apiKey = this.configService.get<string>('modelConfig.token');
-      const modelName = this.configService.get<string>('modelConfig.model');
+      const {
+        url: apiUrl,
+        token: apiKey,
+        model: modelName,
+      } = this.configService.get('modelConfig');
+
       const response = await firstValueFrom(
         this.httpService.post(
           apiUrl,
