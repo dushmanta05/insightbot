@@ -50,12 +50,18 @@ export class SessionController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSessionDto: UpdateSessionDto) {
-    return this.sessionService.update(id, updateSessionDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateSessionDto: UpdateSessionDto,
+  ): Promise<SessionResponseDto> {
+    const site = await this.sessionService.update(id, updateSessionDto);
+    return plainToInstance(SessionResponseDto, site, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.sessionService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.sessionService.remove(id);
   }
 }
