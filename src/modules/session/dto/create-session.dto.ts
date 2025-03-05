@@ -1,11 +1,7 @@
-import { IsNotEmpty, IsUUID, IsObject } from 'class-validator';
+import { IsNotEmpty, IsUUID } from 'class-validator';
 
 export class CreateSessionDto {
   @IsUUID()
   @IsNotEmpty()
   siteId: string;
-
-  @IsObject()
-  @IsNotEmpty()
-  request: object;
 }

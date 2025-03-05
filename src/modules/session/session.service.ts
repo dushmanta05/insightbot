@@ -12,8 +12,14 @@ export class SessionService {
     private readonly sessionRepository: Repository<Session>,
   ) {}
 
-  async create(createSessionDto: CreateSessionDto): Promise<Session> {
-    const session = this.sessionRepository.create(createSessionDto);
+  async create(
+    createSessionDto: CreateSessionDto,
+    requestInfo: object,
+  ): Promise<Session> {
+    const session = this.sessionRepository.create({
+      ...createSessionDto,
+      request: requestInfo,
+    });
     return await this.sessionRepository.save(session);
   }
 

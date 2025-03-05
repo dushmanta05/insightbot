@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
 } from '@nestjs/common';
 import { SessionService } from './session.service';
 import { CreateSessionDto } from './dto/create-session.dto';
@@ -20,8 +21,15 @@ export class SessionController {
   @Post()
   async create(
     @Body() createSessionDto: CreateSessionDto,
+    @Req() req: Request,
   ): Promise<SessionResponseDto> {
-    const session = await this.sessionService.create(createSessionDto);
+    const requestInfo = {
+      userAgent: req.headers['user-agent'],
+    };
+    const session = await this.sessionService.create(
+      createSessionDto,
+      requestInfo,
+    );
     return plainToInstance(SessionResponseDto, session, {
       excludeExtraneousValues: true,
     });
@@ -33,8 +41,12 @@ export class SessionController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.sessionService.findOne(id);
+  async findOne(@Param('id') id: string): Promise<SessionResponseDto> {
+    const session = await this.sessionService.findOne(id);
+
+    return plainToInstance(SessionResponseDto, session, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Patch(':id')
