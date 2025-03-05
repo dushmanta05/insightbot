@@ -1,14 +1,20 @@
 import { Site } from '../../site/entities/site.entity';
-import { Conversation } from '../../conversation/entities/conversation.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
-  OneToMany,
+  BeforeInsert,
+  OneToOne,
 } from 'typeorm';
+
+import { customAlphabet } from 'nanoid';
+
+const nanoid = customAlphabet(
+  '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+  16,
+);
 
 @Entity()
 export class Session {
@@ -18,7 +24,7 @@ export class Session {
   @Column({ type: 'uuid', nullable: false })
   siteId: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: false })
+  @Column({ type: 'varchar', length: 16, nullable: false, unique: true })
   key: string;
 
   @Column({ type: 'jsonb', nullable: false })
@@ -30,9 +36,11 @@ export class Session {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @ManyToOne(() => Site, (site) => site.sessions)
+  @OneToOne(() => Site, (site) => site.id)
   site: Site;
 
-  @OneToMany(() => Conversation, (conversation) => conversation.session)
-  conversations: Conversation[];
+  @BeforeInsert()
+  generateKey() {
+    this.key = nanoid();
+  }
 }

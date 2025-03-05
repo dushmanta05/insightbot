@@ -1,12 +1,14 @@
-import { Session } from '../../session/entities/session.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
+  BeforeInsert,
 } from 'typeorm';
+import { customAlphabet } from 'nanoid';
+
+const nanoid = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 8);
 
 @Entity()
 export class Site {
@@ -19,7 +21,7 @@ export class Site {
   @Column({ type: 'varchar', length: 255, nullable: false })
   name: string;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'varchar', length: 8, nullable: false, unique: true })
   embedCode: string;
 
   @CreateDateColumn({ type: 'timestamp' })
@@ -28,6 +30,8 @@ export class Site {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @OneToMany(() => Session, (session) => session.site)
-  sessions: Session[];
+  @BeforeInsert()
+  generateEmbedCode() {
+    this.embedCode = nanoid();
+  }
 }

@@ -29,6 +29,6 @@ export class Conversation {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @ManyToOne(() => Session, (session) => session.conversations)
+  @ManyToOne(() => Session, (session) => session.id)
   session: Session;
 }
