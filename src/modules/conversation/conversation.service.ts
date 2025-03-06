@@ -5,7 +5,7 @@ import { Conversation } from './entities/conversation.entity';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
 import { UserType } from 'src/common/enums/sender-type.enum';
-import { ApiService } from 'src/common/api/api.service';
+import { ApiService } from 'src/core/api/api.service';
 
 @Injectable()
 export class ConversationService {
