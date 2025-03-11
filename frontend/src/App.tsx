@@ -1,7 +1,7 @@
 function App() {
   return (
     <>
-      <div>Chat</div>
+      <div>AI Chat</div>
     </>
   );
 }
