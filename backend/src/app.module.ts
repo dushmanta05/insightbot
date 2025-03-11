@@ -8,6 +8,7 @@ import { SessionModule } from './modules/session/session.module';
 import { ConversationModule } from './modules/conversation/conversation.module';
 import configuration from './config/configuration';
 import { DatabaseModule } from './config/database/database.module';
+import { GatewayModule } from './core/gateway/gateway.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { DatabaseModule } from './config/database/database.module';
     SiteModule,
     SessionModule,
     ConversationModule,
+    GatewayModule,
   ],
   controllers: [AppController],
   providers: [AppService],
