@@ -6,6 +6,7 @@ import { CreateConversationDto } from './dto/create-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
 import { UserType } from 'src/common/enums/sender-type.enum';
 import { ApiService } from 'src/core/api/api.service';
+import { ChatGateway } from 'src/core/gateway/chat.gateway';
 
 @Injectable()
 export class ConversationService {
@@ -13,6 +14,7 @@ export class ConversationService {
     @InjectRepository(Conversation)
     private readonly conversationRepository: Repository<Conversation>,
     private readonly apiService: ApiService,
+    private readonly chatGateway: ChatGateway,
   ) {}
 
   async create(
@@ -35,27 +37,49 @@ export class ConversationService {
       content: message.content,
     }));
 
-    formattedMessages.push({
-      role: savedUserConversation.role,
-      content: savedUserConversation.content,
-    });
+    this.processAIResponse(formattedMessages, createConversationDto.sessionId);
 
-    const { success, data } =
-      await this.apiService.generateChatResponse(formattedMessages);
+    return savedUserConversation;
+  }
 
-    if (!success) {
-      throw new Error('Failed to generate chat response.');
+  private async processAIResponse(
+    messages: Array<{ role: string; content: string }>,
+    sessionId: string,
+  ) {
+    try {
+      const { success, data } =
+        await this.apiService.generateChatResponse(messages);
+
+      if (!success) {
+        throw new Error('Failed to generate chat response.');
+      }
+
+      const agentConversation = this.conversationRepository.create({
+        content: data.content,
+        role: UserType.ASSISTANT,
+        sessionId: sessionId,
+      });
+      const savedAgentConversation =
+        await this.conversationRepository.save(agentConversation);
+
+      this.chatGateway.server.emit('assistantResponse', {
+        content: savedAgentConversation.content,
+        sessionId: sessionId,
+        messageId: savedAgentConversation.id,
+      });
+
+      return savedAgentConversation;
+    } catch (error) {
+      console.error('Error processing AI response:', error);
+
+      this.chatGateway.server.emit('assistantResponse', {
+        content: 'Sorry, I encountered an error generating a response.',
+        sessionId: sessionId,
+        error: true,
+      });
+
+      throw error;
     }
-
-    const agentConversation = this.conversationRepository.create({
-      content: data.content,
-      role: UserType.ASSISTANT,
-      sessionId: createConversationDto.sessionId,
-    });
-
-    await this.conversationRepository.save(agentConversation);
-
-    return agentConversation;
   }
 
   async findAll(): Promise<Conversation[]> {
