@@ -1,1 +1,1 @@
-# AI Chat
+# Insightbot (Frontend)
