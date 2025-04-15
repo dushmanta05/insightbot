@@ -1,6 +1,6 @@
-// chat.gateway.ts
 import { Injectable, type OnModuleInit } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
+// biome-ignore lint/style/useImportType: <explanation>
+import { ConfigService } from '@nestjs/config';
 import {
   MessageBody,
   SubscribeMessage,
@@ -9,11 +9,12 @@ import {
 } from '@nestjs/websockets';
 import type { Server } from 'socket.io';
 
-@Injectable()
 @WebSocketGateway()
+@Injectable()
 export class ChatGateway implements OnModuleInit {
   @WebSocketServer()
   server: Server;
+
   constructor(private readonly configService: ConfigService) {}
 
   onModuleInit() {
