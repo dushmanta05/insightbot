@@ -46,16 +46,20 @@ export class ConversationService {
     messages: Array<{ role: string; content: string }>,
     sessionId: string,
   ) {
+    const dummyContent = 'Lorem ipsum dolor sit amet, consectetur.';
     try {
+      /*
       const { success, data } =
         await this.apiService.generateChatResponse(messages);
 
       if (!success) {
         throw new Error('Failed to generate chat response.');
       }
+      */
 
       const agentConversation = this.conversationRepository.create({
-        content: data.content,
+        // content: data.content,
+        content: dummyContent,
         role: UserType.ASSISTANT,
         sessionId: sessionId,
       });
