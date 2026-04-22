@@ -1,16 +1,10 @@
-import { useState, useRef, useEffect, useContext } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Send } from 'lucide-react';
 
-import { WebsocketContext } from './contexts/WebsocketContext';
+import { useSocket } from './contexts/WebsocketContext';
 import MessageList from './components/MessageList';
 import config from './config';
 import type { Message } from './types';
@@ -21,17 +15,15 @@ function App() {
   const [isTyping, setIsTyping] = useState(false);
   const [sessionId] = useState(config.sessionId);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const socket = useContext(WebsocketContext);
+  const socket = useSocket();
 
   useEffect(() => {
     fetchInitialMessages();
   }, []);
 
   useEffect(() => {
-    socket?.on('assistantResponse', handleAssistantResponse);
-    return () => {
-      socket?.off('assistantResponse');
-    };
+    const cleanup = socket.on('assistantResponse', handleAssistantResponse);
+    return cleanup;
   }, [socket]);
 
   useEffect(() => {
@@ -151,11 +143,7 @@ function App() {
               disabled={isTyping}
               className='flex-1'
             />
-            <Button
-              type='submit'
-              size='icon'
-              disabled={isTyping || !input.trim()}
-            >
+            <Button type='submit' size='icon' disabled={isTyping || !input.trim()}>
               <Send className='h-4 w-4' />
             </Button>
           </form>

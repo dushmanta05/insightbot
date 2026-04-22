@@ -1,20 +1,30 @@
-import { createContext } from 'react';
-import { io, type Socket } from 'socket.io-client';
+import { createContext, useContext, type ReactNode } from 'react';
+import { useSharedSocket } from '../hooks/useSharedSocket';
 
-import config from '../config';
+interface SocketContextValue {
+  on: (event: string, callback: (data: unknown) => void) => () => void;
+  off: (event: string) => void;
+  emit: (event: string, payload?: unknown) => void;
+  isConnected: boolean;
+  socketId: string | null;
+}
 
-export const socket = io(config.wsUrl, {
-  autoConnect: true,
-  transports: ['websocket'],
-});
+const WebsocketContext = createContext<SocketContextValue | null>(null);
 
-socket.on('connect', () => {
-  console.log('WebSocket connected!');
-});
+interface WebsocketProviderProps {
+  children: ReactNode;
+}
 
-socket.on('connect_error', (error) => {
-  console.error('WebSocket connection error:', error);
-});
+export function WebsocketProvider({ children }: WebsocketProviderProps) {
+  const socket = useSharedSocket();
 
-export const WebsocketContext = createContext<Socket>(socket);
-export const WebsocketProvider = WebsocketContext.Provider;
+  return <WebsocketContext.Provider value={socket}>{children}</WebsocketContext.Provider>;
+}
+
+export function useSocket(): SocketContextValue {
+  const context = useContext(WebsocketContext);
+  if (!context) {
+    throw new Error('useSocket must be used within a WebsocketProvider');
+  }
+  return context;
+}
